@@ -11,9 +11,9 @@ import * as Prom from '../../services/Acsys/Acsys';
 
 
 const INITIAL_STATE = {
-  username: '',
+  username: 'acsystestuser',
   email: '',
-  passwordOne: '',
+  passwordOne: 'acsysdemopsswrd',
   passwordTwo: '',
   message: '',
   isInstalled: true,

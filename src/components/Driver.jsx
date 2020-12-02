@@ -97,6 +97,7 @@ class Driver extends React.Component {
                     <Grid item xs />
                     {Prom.getRole() !== 'Viewer' ? (
                       <Grid item>
+                        <Typography color="secondary" variant="p">(All write operations have been disabled for this demo) </Typography>
                         <Typography color="inherit" variant="p">
                           Perspective:
                         </Typography>
