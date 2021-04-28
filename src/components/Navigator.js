@@ -7,6 +7,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { createStyles, useTheme, withStyles } from '@material-ui/core/styles';
+import HomeIcon from '@material-ui/icons/Home';
 import CloseIcon from '@material-ui/icons/Close';
 import FolderIcon from '@material-ui/icons/Folder';
 import InfoIcon from '@material-ui/icons/Info';
@@ -67,6 +68,7 @@ function Navigator(props) {
     {
       id: 'Content',
       children: [
+        { id: 'Dashboard', icon: <HomeIcon />, route: ROUTES.Dashboard },
         { id: 'Content', icon: <FolderIcon />, route: ROUTES.LogicalContent },
         {
           id: 'Storage',
@@ -85,6 +87,7 @@ function Navigator(props) {
       {
         id: 'Content',
         children: [
+          { id: 'Dashboard', icon: <HomeIcon />, route: ROUTES.Dashboard },
           { id: 'Content', icon: <FolderIcon />, route: ROUTES.LogicalContent },
           {
             id: 'Storage',

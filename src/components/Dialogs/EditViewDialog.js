@@ -7,7 +7,9 @@ import {
   DialogContent,
   CircularProgress,
   MenuItem,
+  NativeSelect,
   Select,
+  Typography,
 } from '@material-ui/core';
 
 export default function EditViewDialog(props) {
@@ -49,6 +51,17 @@ export default function EditViewDialog(props) {
             defaultValue={props.description}
             onChange={(e) => props.setDescription(e.target.value)}
           />
+        </div>
+        <div style={{ marginTop: 20, marginBottom: 20 }}>
+          <Typography>Add To Dashboard</Typography>
+          <NativeSelect
+            defaultValue={props.onDashboard}
+            onChange={(e) => props.linkToDashboard(e.target.value == 'true')}
+            style={{ width: '100%' }}
+          >
+            <option value={true}>True</option>
+            <option value={false}>False</option>
+          </NativeSelect>
         </div>
       </DialogContent>
       <DialogActions>

@@ -1,4 +1,12 @@
 import {
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  MenuItem,
+  Select,
   Table,
   TableBody,
   TableCell,
@@ -50,7 +58,7 @@ let tempView = [];
 let table = '';
 let position = 0;
 
-class LogicalContent extends React.Component {
+class Dashboard extends React.Component {
   state = { ...INITIAL_STATE };
 
   setTable = (table) => {
@@ -89,10 +97,6 @@ class LogicalContent extends React.Component {
 
   setTempDescription = (value) => {
     tempView['description'] = value;
-  };
-
-  linkToDashboard = (value) => {
-    tempView['link_to_dashboard'] = value;
   };
 
   deleteView = async () => {
@@ -155,16 +159,6 @@ class LogicalContent extends React.Component {
       await Acsys.repositionViews(tempView, oldPosition, position);
       await this.sleep(1000);
     }
-    if (tempView.linkToDashboard) {
-      await Acsys.deleteData('acsys_dashboard_content', [
-        ['acsys_id', '=', tempView.acsys_id],
-      ]);
-      await Acsys.insertData('acsys_dashboard_content', tempView);
-    } else {
-      await Acsys.deleteData('acsys_dashboard_content', [
-        ['acsys_id', '=', tempView.acsys_id],
-      ]);
-    }
     const currentView = await Acsys.getData('acsys_logical_content', [], '', [
       'position',
     ]);
@@ -195,7 +189,7 @@ class LogicalContent extends React.Component {
   }
 
   componentDidMount = async () => {
-    this.props.setHeader('Content');
+    this.props.setHeader('Dashboard');
     this.context.setHeld(false);
     tempView = [];
     this.setState({
@@ -210,7 +204,7 @@ class LogicalContent extends React.Component {
 
     let currentView = [];
 
-    currentView = await Acsys.getData('acsys_logical_content', [], '', [
+    currentView = await Acsys.getData('acsys_dashboard_content', [], '', [
       'position',
     ]);
 
@@ -241,7 +235,6 @@ class LogicalContent extends React.Component {
       let newEntry = {
         acsys_id: uniqid(),
         name: this.state.name,
-        link_to_dashboard: false,
         description: this.state.description,
         viewId: uId,
         source_collection: this.state.collection,
@@ -271,58 +264,68 @@ class LogicalContent extends React.Component {
         } = views;
         return (
           <TableRow key={acsys_id}>
-            <TableCell
-              to={{
-                pathname: '/CollectionView/' + source_collection + '/' + viewId,
-                state: {
-                  table_keys: [],
-                  view: name,
-                },
-              }}
-              component={Link}
-              style={{ minWidth: 150 }}
-            >
-              {name}
-            </TableCell>
-            <TableCell
-              to={{
-                pathname: '/CollectionView/' + source_collection + '/' + viewId,
-                state: {
-                  table_keys: [],
-                  view: name,
-                },
-              }}
-              component={Link}
-              style={{ width: '100%' }}
-            >
-              {description}
-            </TableCell>
-            {Acsys.getMode() === 'Administrator' ? (
-              <TableCell style={{ minWidth: 70 }} align="right">
-                <Tooltip title="Edit View">
-                  <IconButton
-                    edge="start"
-                    color="inherit"
-                    aria-label="edit"
-                    onClick={() => this.handleEditOpen(views)}
-                    style={{ marginRight: 10 }}
-                  >
-                    <CreateIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Delete View">
-                  <IconButton
-                    edge="start"
-                    color="inherit"
-                    aria-label="delete"
-                    onClick={() => this.handleDeleteOpen(viewId)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Tooltip>
+            {table_keys.length < 1 ? (
+              <TableCell
+                to={{
+                  pathname:
+                    '/CollectionView/' + source_collection + '/' + viewId,
+                  state: {
+                    table_keys: [],
+                    view: name,
+                  },
+                }}
+                component={Link}
+                style={{ minWidth: 150 }}
+              >
+                {name}
               </TableCell>
             ) : (
-              <div />
+              <TableCell
+                to={{
+                  pathname: '/DocumentView',
+                  state: {
+                    mode: 'update',
+                    table_keys: views.table_keys,
+                    routed: true,
+                    viewId: views.viewId,
+                  },
+                }}
+                component={Link}
+                style={{ minWidth: 150 }}
+              >
+                {name}
+              </TableCell>
+            )}
+            {table_keys.length < 1 ? (
+              <TableCell
+                to={{
+                  pathname:
+                    '/CollectionView/' + source_collection + '/' + viewId,
+                  state: {
+                    table_keys: [],
+                    view: name,
+                  },
+                }}
+                component={Link}
+                style={{ width: '100%' }}
+              >
+                {description}
+              </TableCell>
+            ) : (
+              <TableCell
+                to={{
+                  pathname: '/DocumentView',
+                  state: {
+                    mode: 'update',
+                    table_keys: views.table_keys,
+                    routed: true,
+                    viewId: views.viewId,
+                  },
+                }}
+                component={Link}
+              >
+                {description}
+              </TableCell>
             )}
           </TableRow>
         );
@@ -370,17 +373,6 @@ class LogicalContent extends React.Component {
                         Project: {projectName}
                       </Typography>
                     </Grid>
-                    <Grid item>
-                      <Tooltip title="Add New View For Table">
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={this.handleClickOpen}
-                        >
-                          Add View
-                        </Button>
-                      </Tooltip>
-                    </Grid>
                   </Grid>
                 ) : (
                   <Grid container spacing={1}>
@@ -423,21 +415,6 @@ class LogicalContent extends React.Component {
                     >
                       DESCRIPTION
                     </TableCell>
-                    {Acsys.getMode() === 'Administrator' ? (
-                      <TableCell
-                        style={{
-                          paddingLeft: 16,
-                          paddingRight: 16,
-                          paddingTop: 5,
-                          paddingBottom: 5,
-                        }}
-                        align="right"
-                      >
-                        ACTIONS
-                      </TableCell>
-                    ) : (
-                      <div />
-                    )}
                   </TableRow>
                 </TableHead>
                 <TableBody>{this.renderTableData()}</TableBody>
@@ -481,8 +458,6 @@ class LogicalContent extends React.Component {
               setName={this.setTempName}
               description={tempView.description}
               setDescription={this.setTempDescription}
-              onDashboard={tempView.linkToDashboard}
-              linkToDashboard={this.linkToDashboard}
               action={this.editView}
               actionProcess={saveLoading}
             />
@@ -502,7 +477,7 @@ class LogicalContent extends React.Component {
         <div style={{ maxWidth: 1236, margin: 'auto' }}>
           <Paper style={{ height: 40 }}>
             <div style={{ padding: 10, margin: 'auto' }}>
-              Please make sure database has been created.
+              Please add views to dashboard.
             </div>
           </Paper>
         </div>
@@ -510,5 +485,5 @@ class LogicalContent extends React.Component {
     }
   }
 }
-LogicalContent.contextType = AcsysConsumer;
-export default LogicalContent;
+Dashboard.contextType = AcsysConsumer;
+export default Dashboard;

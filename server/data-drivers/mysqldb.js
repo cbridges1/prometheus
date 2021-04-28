@@ -112,7 +112,7 @@ class MysqlDriver {
         (error, rows) => {}
       );
       db.query(
-        'CREATE TABLE IF NOT EXISTS acsys_logical_content (acsys_id TEXT, name TEXT, description TEXT, viewId TEXT, source_collection TEXT, position INT, table_keys TEXT)',
+        'CREATE TABLE IF NOT EXISTS acsys_logical_content (acsys_id TEXT, name TEXT, link_to_dashboard INT, description TEXT, viewId TEXT, source_collection TEXT, position INT, table_keys TEXT)',
         (error, rows) => {}
       );
       db.query(

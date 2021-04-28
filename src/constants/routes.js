@@ -1,6 +1,7 @@
 export const SIGN_UP = '/signup';
 export const SIGN_IN = '/signin';
 export const Database = '/Database';
+export const Dashboard = '/Dashboard';
 export const LogicalContent = '/LogicalContent';
 export const CollectionView = '/CollectionView/:acsys_id/:content_id';
 export const DocumentView = '/DocumentView';

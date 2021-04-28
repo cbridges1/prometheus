@@ -601,11 +601,6 @@ class CollectionView extends React.Component {
     }
   }
 
-  renderCellData(rowData) {
-    return rowData.map((column) => {
-      return <TableCell>{column}</TableCell>;
-    });
-  }
   renderTableData() {
     const { content_id, tableData, documentDetails, page } = this.state;
 
@@ -985,6 +980,7 @@ class CollectionView extends React.Component {
           <ViewDialog
             open={this.state.setViewOpen}
             closeDialog={this.handleViewClose}
+            contentId={this.props.match.params.content_id}
             viewOrderField={view_orderField}
             setOrderField={this.setOrderField}
             docDetails={tempDetails}

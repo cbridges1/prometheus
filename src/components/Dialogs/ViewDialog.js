@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  Box,
   Button,
   CircularProgress,
   Dialog,
@@ -7,12 +8,43 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
+  ExpansionPanel,
+  ExpansionPanelSummary,
+  ExpansionPanelDetails,
   Grid,
   NativeSelect,
   Typography,
 } from '@material-ui/core';
+import { KeyboardArrowDown } from '@material-ui/icons';
+import * as Acsys from '../../utils/Acsys/Acsys';
 
 export default function ViewDialog(props) {
+  const [tables, setTables] = useState([]);
+  const [tableColumns, setTableColumns] = useState([]);
+  const [viewColumns, setViewColumns] = useState([]);
+  const handleTableColumns = async (contentId) => {
+    const tempColumns = await Acsys.getData('acsys_document_details', [
+      ['content_id', '=', contentId],
+    ]);
+    setTableColumns(tempColumns);
+  };
+  const handleViewColumns = async (contentId) => {
+    const tempColumns = await Acsys.getData('acsys_document_details', [
+      ['content_id', '=', contentId],
+    ]);
+    setViewColumns(tempColumns);
+  };
+  useEffect(async () => {
+    const tempTables = await Acsys.getData('acsys_logical_content', []);
+    let tTables = [];
+    for (let i = 0; i < tempTables.length; i++) {
+      if (tempTables[i].viewId !== props.contentId) {
+        tTables.push(tempTables[i]);
+      }
+    }
+    setTables(tTables);
+    handleTableColumns(props.contentId);
+  }, []);
   return (
     <Dialog
       open={props.open}
@@ -122,6 +154,62 @@ export default function ViewDialog(props) {
                   <option value={true}>Locked (No API Access)</option>
                   <option value={false}>Unlocked (API Access)</option>
                 </NativeSelect>
+              </div>
+            </Grid>
+            <Grid item xs={12}>
+              <div>
+                <ExpansionPanel
+                  style={{ clear: 'both', marginTop: 30 }}
+                  // onChange={(e) =>
+                  //   this.setState({
+                  //     updateBucket: !this.state.updateBucket,
+                  //   })
+                  // }
+                >
+                  <ExpansionPanelSummary
+                    expandIcon={<KeyboardArrowDown />}
+                    aria-controls="panel1a-content"
+                    id="panel1a-header"
+                  >
+                    <Typography>Link To View</Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    <Box
+                      margin="auto"
+                      width="90%"
+                      display="flex"
+                      flexDirection="column"
+                      textAlign="center"
+                      // padding="16px"
+                    >
+                      <NativeSelect
+                        // value={bucket}
+                        onChange={(e) => handleViewColumns(e.target.value)}
+                        style={{ width: '100%' }}
+                      >
+                        {tables.map((table) => (
+                          <option value={table.viewId}>
+                            {table.source_collection}
+                          </option>
+                        ))}
+                      </NativeSelect>
+                      <NativeSelect style={{ width: '100%' }}>
+                        {tableColumns.map((column) => (
+                          <option value={column.field_name}>
+                            {column.field_name}
+                          </option>
+                        ))}
+                      </NativeSelect>
+                      <NativeSelect style={{ width: '100%' }}>
+                        {viewColumns.map((column) => (
+                          <option value={column.field_name}>
+                            {column.field_name}
+                          </option>
+                        ))}
+                      </NativeSelect>
+                    </Box>
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
               </div>
             </Grid>
           </Grid>
